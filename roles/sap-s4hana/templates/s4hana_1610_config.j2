@@ -1,0 +1,40 @@
+NW_HDB_DB.abapSchemaName = {{ abap_schema_name }}
+NW_CI_Instance.ascsInstanceNumber = {{ abap_ascs_instance_num }}
+NW_CI_Instance.ascsVirtualHostname = {{ virtual_hostname }}
+NW_CI_Instance.ciInstanceNumber = {{ abap_ci_num }}
+NW_CI_Instance.ciVirtualHostname = {{ virtual_hostname }}
+NW_CI_Instance.scsVirtualHostname = {{ virtual_hostname }}
+NW_GetSidNoProfiles.sid = {{ sap_sid }}
+NW_HDB_getDBInfo.dbhost = {{ hdb_hostname }}
+NW_HDB_getDBInfo.dbsid = {{ hana_sid }}
+NW_HDB_getDBInfo.instanceNumber = {{ hana_instance_num }}
+storageBasedCopy.hdb.instanceNumber = {{ hana_instance_num }}
+NW_getFQDN.FQDN = {{ sys_fqdn }}
+
+NW_GetMasterPassword.masterPwd = {{ master_passwd_all }}
+nwUsers.sidadmPassword = {{ master_passwd_all }}
+hostAgent.sapAdmPassword = {{ master_passwd_all }}
+HDB_Schema_Check_Dialogs.schemaPassword = {{ master_passwd_all }}
+NW_HDB_getDBInfo.systemDbPassword = {{ hana_passwd_all }}
+NW_HDB_getDBInfo.systemPassword = {{ hana_passwd_all }}
+storageBasedCopy.hdb.systemPassword = {{ hana_passwd_all }}
+
+SAPINST.CD.PACKAGE.LOAD = {{ sapinst_load }}
+SAPINST.CD.PACKAGE.KERNEL = {{ sapinst_kernel }}
+SAPINST.CD.PACKAGE.RDBMS = {{ sapinst_rdbms }}
+NW_SAPCrypto.SAPCryptoFile = {{ nw_crypto_file }}
+NW_Unpack.igsExeSar = {{ nw_igs_exesar }}
+NW_Unpack.igsHelperSar = {{ nw_igs_helpersar }}
+NW_Unpack.sapExeDbSar = {{ nw_exe_dbsar }}
+NW_Unpack.sapExeSar = {{ nw_exesar }}
+
+NW_ABAP_Import_Dialog.dbCodepage = 4103
+NW_ABAP_Import_Dialog.migmonJobNum = 18
+NW_ABAP_Import_Dialog.migmonLoadArgs = -c 100000 -loadprocedure dbsl -rowstorelist /usr/sap/install_log/rowstorelist.txt
+NW_ABAP_SSFS_CustomKey.ssfsKeyInputFile =
+NW_CI_Instance_ABAP_Reports.executeReportsForDepooling = true
+NW_Delete_Sapinst_Users.removeUsers = true
+hanadb.landscape.reorg.useParameterFile = DONOTUSEFILE
+hdb.create.dbacockpit.user = true
+NW_getLoadType.loadType = SAP
+NW_liveCache.useLiveCache = false

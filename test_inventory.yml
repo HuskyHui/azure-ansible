@@ -1,0 +1,12 @@
+- name: check
+  hosts: localhost
+  tasks:
+    -  name: check if vm exists in inventory
+       lineinfile:
+         line: poctest06
+         dest: /etc/ansible/inventory/hosts
+         state: absent
+       check_mode: yes
+       register: inventory_tags
+    -  debug:
+         var: inventory_tags

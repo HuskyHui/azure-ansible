@@ -1,0 +1,27 @@
+#- name: enable preserve hostname
+#  replace:
+#    path: /etc/cloud/cloud.cfg
+#    regexp: 'preserve_hostname: false'
+#    replace: 'preserve_hostname: true'
+#    backup: no
+
+- name: disable hostname from dhcp
+  replace:
+    path: /etc/sysconfig/network/dhcp
+    regexp: 'DHCLIENT_SET_HOSTNAME="yes"'
+    replace: 'DHCLIENT_SET_HOSTNAME="no"'
+    backup: no
+  notify:
+    - Restart Network
+
+- name: modify hosts file
+  lineinfile: 
+    dest: "/etc/hosts"
+    line: "{{ ansible_default_ipv4.address }} {{ sys_hostname }}.{{ sys_fqdn }} {{ sys_hostname }}"
+    regexp: "(^|\n){{ ansible_default_ipv4.address }} (.*)"
+
+- name: set hostname
+  hostname: 
+    name: "{{ sys_hostname }}"
+  notify:
+    - Restart Network

@@ -1,0 +1,12 @@
+---
+# tasks file for keys
+- fail: msg="Missing required parameter key_name or key_action"
+  when: key_action is not defined or key_name is not defined
+
+- block:
+    - include: keypair_create.yml
+  when: key_action == "create"
+
+- block:
+    - include: keypair_delete.yml
+  when: key_action == "delete"

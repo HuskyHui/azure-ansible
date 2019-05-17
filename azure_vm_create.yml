@@ -1,0 +1,16 @@
+- name: create Azure VM
+  hosts: localhost
+  gather_facts: False
+  vars:
+    azure_profile: "test_hosts"
+    hostgroup_name: "{{ azure_profile }}"
+    key_name: "{{ vm_name }}"
+    public_ip_name: "{{ vm_name }}"
+    network_interface_name: "{{ vm_name }}"
+    
+  roles:
+    - { role: azure_vm, vm_action: "check", delegate_facts: True }
+    - { role: azure_key, key_action: "create", delegate_facts: True }
+    - { role: azure_public_ip, public_ip_action: "create", delegate_facts: True }
+    - { role: azure_network_interface, network_interface_action: "create", delegate_facts: True }
+    - { role: azure_vm, vm_action: "create", ssh_public_key_data: "{{ lookup('file', '{{ ssh_key_path }}/{{ vm_name }}.pub') }}", delegate_facts: True }

@@ -1,0 +1,20 @@
+# --extra-vars="vm_name=ansible_test_vm"
+
+- hosts: localhost
+  gather_facts: False
+  vars:
+    key_name: "{{ vm_name }}_key"
+#   iam_instance_role: "SharedServicesS3"
+    ali_profile: "ali_test"
+    ali_region: "cn-shanghai"
+    assign_public_ip: no
+    ali_service_offering: ecs.sn2ne.xlarge
+#    sec_group: sg-a88db4c3
+#    internet_max_bandwidth_out: 10
+    internet_max_bandwidth_in: "100"
+    sec_group: "sg-uf63e9hwma1ordyslsjp"
+    ali_image: sles_12_sp2_64_20G_alibase_20170907.vhd
+    vpc_subnet_id: vsw-uf6m8rt5d97hq4lnz1mo7
+  roles:
+    - { role: ali_key, key_action: "create", key_name: "{{ vm_name }}_key", delegate_facts: True }
+    - { role: ali_vm, vm_action: "create", hostgroup_name: "{{ ali_profile }}", delegate_facts: True }

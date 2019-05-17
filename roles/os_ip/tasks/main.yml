@@ -1,0 +1,5 @@
+- block:
+    - include: sles_secondary_ip.yml
+  when: os_ip_action == "add_sec_ip" or os_ip_action == "del_sec_ip"
+
+- meta: flush_handlers

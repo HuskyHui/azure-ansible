@@ -1,0 +1,7 @@
+### kiey_name can be generated from {{ vm_name }}_key but can also be an arbitrary string
+## --extra-vars="vm_name=test_vm"
+- hosts: localhost
+  vars:
+    key_name: "{{ vm_name }}"
+  roles:
+    - { role: azure_key, key_action: "create", delegate_facts: True }

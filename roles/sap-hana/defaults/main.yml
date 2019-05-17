@@ -1,0 +1,35 @@
+# these variables are default ones, may be overriden by extra-vars
+# bitcloud defaults
+hana_version: "100_122_4"
+hana_archive: "IMDB_SERVER{{hana_version}}.SAR"
+hana_downloads:
+  - "hana/{{hana_archive}}"
+  - "hana/SAPCAR"
+repo_type: "mount"
+hana_instance_num: "00"
+hana_passwd_all: "BIT.hana2016"
+#sapadm_passwd: "BIT.hana2016"
+#sysadm_passwd: "BIT.hana2016" 
+#sysusr_passwd: "BIT.hana2016" 
+# install paths
+install_data_path: "/install"
+hdb_archive_folder: "SAP_HANA_DATABASE"
+hdb_server_path: "{{ install_data_path }}/{{ hdb_archive_folder }}"
+install_config_file: "{{ install_data_path }}/configfile"
+
+# virtual hostname defaults
+
+virtual_hostname: "{{ ansible_hostname }}"
+virtual_ip: "{{ ansible_default_ipv4.address }}"
+
+system_usage: "prod"
+
+# AWS defaults
+# repo_type: "s3",
+# s3_bucket: "itelligence-sap-media",
+# hana_archive: "HDB_SERVER_LINUX_X86_64.SAR"
+# hdb_archive_folder: "HDB_SERVER_LINUX_X86_64"
+# hana_downloads:
+#   - "SAPCAR"
+#   - "SAP_automated_installation/Database/HDB_2.00.020.00/HDB_SERVER_LINUX_X86_64.SAR"
+# install_data_path: "/install"

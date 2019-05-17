@@ -1,0 +1,8 @@
+- name: remove vm and all resources
+  azure_rm_virtualmachine:
+    resource_group: "{{ rg }}"
+    name: "{{ vm_name }}"
+    state: absent
+    remove_on_absent:
+        - all
+  when: vm_name is defined

@@ -1,0 +1,75 @@
+- hosts: localhost
+  vars:
+# defaults for standard mode
+    azure_profile: "test_hosts"
+    hostgroup_name: "{{ azure_profile }}"
+    key_name: "{{ vm_name }}"
+    public_ip_name: "{{ vm_name }}"
+    network_interface_name: "{{ vm_name }}"
+    ec2_service_offering: "{{ hana_size_map[system_usage][db_size_gb].instance_type }}"
+    hana_sap_size: "{{ hana_size_map[system_usage][db_size_gb].sap_size }}"
+    install_size: 50
+    hana_data_size: "{{ hana_size_map[system_usage][db_size_gb].data_size }}"
+    hana_log_size: "{{ hana_size_map[system_usage][db_size_gb].log_size }}"
+    hana_shared_size: "{{ hana_size_map[system_usage][db_size_gb].shared_size }}"
+    data_log_pv_size: "{{ hana_size_map[system_usage][db_size_gb].data_log_pv_size }}"
+    swap_size: 2
+  roles:
+    - { role: azure_vm, vm_action: "check", delegate_facts: True }
+    - { role: azure_key, key_action: "create", delegate_facts: True }
+    - { role: azure_public_ip, public_ip_action: "create", delegate_facts: True }
+    - { role: azure_network_interface, network_interface_action: "create", delegate_facts: True }
+    - { role: azure_vm, vm_action: "create", ssh_public_key_data: "{{ lookup('file', '{{ ssh_key_path }}/{{ vm_name }}.pub') }}", delegate_facts: True }
+    - { role: azure_network_interface, network_interface_action: "create_priv_ip", delegate_facts: True }
+    - { role: azure_volume, delegate_facts: True, volume_action: "create", disk_name: "{{ vm_name }}-swap", disk_size: "{{ swap_size }}" }
+    - { role: azure_volume, delegate_facts: True, volume_action: "create", disk_name: "{{ vm_name }}-install", disk_size: "{{ install_size }}" }
+    - { role: azure_volume, delegate_facts: True, volume_action: "create", disk_name: "{{ vm_name }}-hana-sap", disk_size: "{{ hana_sap_size }}" }
+    - { role: azure_volume, delegate_facts: True, volume_action: "create", disk_name: "{{ vm_name }}-hana-shared", disk_size: "{{ hana_shared_size }}" }
+    - { role: azure_volume, delegate_facts: True, volume_action: "create", disk_name: "{{ vm_name }}-hana-data-log-1", disk_size: "{{ data_log_pv_size }}" }
+    - { role: azure_volume, delegate_facts: True, volume_action: "create", disk_name: "{{ vm_name }}-hana-data-log-2", disk_size: "{{ data_log_pv_size }}" }
+    - { role: azure_volume, delegate_facts: True, volume_action: "create", disk_name: "{{ vm_name }}-hana-data-log-3", disk_size: "{{ data_log_pv_size }}" }
+
+- hosts: "{{ vm_name }}"
+  vars:
+# defaults for standard mode
+# version may be e.g 200_024_0 or latest
+    hana_version: "latest"
+#    repo_type: "s3"
+#    s3_bucket: "itelligence-sap-media"
+    hana_archive: "{{ hana_dnld_map[hana_version].path.split('/')[-1] }}"
+    hdb_archive_folder: "{{ hana_dnld_map[hana_version].folder }}"
+    hana_downloads:
+      - "SAPCAR"
+      - "{{ hana_dnld_map[hana_version].path }}"
+    install_data_path: "/install"
+    hana_sap_size: "{{ hana_size_map[system_usage][db_size_gb].sap_size }}"
+    hana_data_size: "{{ hana_size_map[system_usage][db_size_gb].data_size }}"
+    hana_log_size: "{{ hana_size_map[system_usage][db_size_gb].log_size }}"
+    hana_shared_size: "{{ hana_size_map[system_usage][db_size_gb].shared_size }}"
+    data_log_pv_size: "{{ hana_size_map[system_usage][db_size_gb].data_log_pv_size }}"
+    install_size: 50
+    swap_size: 2
+#    secondary_ip: "{{ hostvars['localhost'].secondary_ip }}"
+  roles:
+   - { role: core, delegate_facts: True }
+   - { role: os_ip, delegate_facts: True, os_ip_action: "add_sec_ip", secondary_int_name: "virtualip" }
+   - { role: disk-fs, delegate_facts: True, disksize: "{{ swap_size }}", volname: "sysswap", mountpoint: "none", fstype: "swap", mnt_opts: "defaults" }
+   - { role: disk-fs, delegate_facts: True, disksize: "{{ install_size }}", volname: "sapinstall", mountpoint: "/mnt{{ install_data_path }}", fstype: "ext4", mnt_opts: "defaults" }
+# lvm for exe and shared
+   - { role: disk2vg, delegate_facts: True, vg_action: "create", disk_sizes_gb: ["{{ hana_sap_size }}","{{ hana_shared_size }}"], vg_name: "vgbin01" }
+   - { role: lvm_vol, delegate_facts: True, lv_action: "create", volname: "sap", vg_name: "vgbin01", lv_size: "{{ hana_sap_size }}g", mountpoint: "/mnt/hana/sap", fstype: "xfs", mnt_opts: "defaults" }
+   - { role: lvm_vol, delegate_facts: True, lv_action: "create", volname: "shared", vg_name: "vgbin01", lv_size: "100%FREE", mountpoint: "/mnt/hana/shared", fstype: "xfs", mnt_opts: "defaults" }
+# lvm for log and data
+   - { role: disk2vg, delegate_facts: True, vg_action: "create", disk_sizes_gb: ["{{ data_log_pv_size }}","{{ data_log_pv_size }}","{{ data_log_pv_size }}"], vg_name: "vghana" }
+   - { role: lvm_vol, delegate_facts: True, lv_action: "create", volname: "hanadata", vg_name: "vghana", lv_size: "{{ hana_data_size }}g", mountpoint: "/mnt/hana/data", fstype: "xfs", mnt_opts: "rw,noatime,nodiratime,logbufs=8,inode64,largeio", lv_opts: "--stripes 3" }
+   - { role: lvm_vol, delegate_facts: True, lv_action: "create", volname: "hanalog", vg_name: "vghana", lv_size: "100%FREE", mountpoint: "/mnt/hana/log", fstype: "xfs", mnt_opts: "rw,noatime,nodiratime,nobarrier,logbufs=8,inode64,largeio", lv_opts: "--stripes 3" }
+   - { role: fs-bind, delegate_facts: True, source: "/mnt/hana/sap", target: "/usr/sap" }
+   - { role: fs-bind, delegate_facts: True, source: "/mnt/hana/shared", target: "/hana/shared" }
+   - { role: fs-bind, delegate_facts: True, source: "/mnt/hana/data", target: "/hana/data" }
+   - { role: fs-bind, delegate_facts: True, source: "/mnt/hana/log", target: "/hana/log" }
+   - { role: fs-bind, delegate_facts: True, source: "/mnt{{ install_data_path }}", target: "{{ install_data_path }}" }
+   - { role: sap-hana, delegate_facts: True }
+
+- hosts: localhost
+  roles:
+    - { role: azure_volume, delegate_facts: True, volume_action: "delete", disk_name: "{{ vm_name }}-install" }

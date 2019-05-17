@@ -1,0 +1,9 @@
+# these variables may be overriden by extra-vars
+hana_studio_version: "2_122_6"
+hana_studio_archive: "IMC_STUDIO{{hana_studio_version}}.SAR"
+hana_studio_downloads:
+  - "hana/{{hana_studio_archive}}"
+  - "hana/SAPCAR"
+# Flags to see if the hana files are downloaded and the application is installed
+hana_studio_dnld_flag: "/install/hana_studio_dnld_flag"
+hana_studio_inst_flag: "/install/hana_studio_inst_flag"

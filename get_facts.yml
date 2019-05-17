@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Get facts by name
+    azure_rm_networkinterface_facts:
+      resource_group: "{{ rg }}"
+      name: poctest02
+    register: niec_facts
+
+  - debug:
+      var: niec_facts

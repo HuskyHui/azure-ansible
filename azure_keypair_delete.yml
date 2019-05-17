@@ -1,0 +1,9 @@
+# Delete azure_keypair to be used for deleting vms
+### key_name should be generated from {{ vm_name }}_key
+## --extra-vars="vm_name=test_vm"
+
+- hosts: localhost
+  vars:
+    key_name: "{{ vm_name }}"
+  roles:
+    - { role: azure_key, key_action: "delete", delegate_facts: True }

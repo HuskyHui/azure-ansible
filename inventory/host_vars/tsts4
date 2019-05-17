@@ -1,0 +1,10 @@
+ansible_ssh_host: 10.164.53.9
+ansible_ssh_private_key_file: ~/.ssh/ansible-keys/tsts4
+ansible_ssh_user: geadmin
+ansible_become_pass: "Welcome123!@"
+ansible_connection: ssh
+ansible_ssh_port: 22
+#ansible_become: True
+ansible_become_method: sudo
+ansible_become_user: root
+vm_id: 0feaf59c-0ab3-4edc-a2c8-baa34325f113

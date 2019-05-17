@@ -1,0 +1,29 @@
+- block:
+  - name: Check for suitable Volume by size
+    script: disk-detection.sh {{ disk_size }}G
+    register: disk_detection_disksize
+    when: disk_sizes_gb is defined
+
+  - name: format data
+    set_fact:
+      stdout_list: "{{ disk_detection_disksize.stdout_lines[1:] }}"
+    when: disk_sizes_gb is defined
+
+- debug: msg="no suitable volumes found skipping filesystem"
+  when: disk_detection_disksize.stdout_lines|length <= 1
+
+- block:
+  # modify the following step to take only the number of disks of the same size, which are occured in the disk_sizes_gb list
+  - name: get number of required disks of this size
+    shell: echo "{{ disk_sizes_gb }}" | awk -F"{{ disk_size }}" '{print NF-1}'
+    register: required_number
+
+  - set_fact:  
+      free_disks_required: "{{ stdout_list[:required_number.stdout|int] }}"
+  - debug:
+      var: free_disks_required
+  - set_fact: 
+      free_disks: "{{ free_disks }},{{ item }}"
+    with_items: "{{ free_disks_required }}"
+
+  when: disk_detection_disksize is defined and stdout_list|length > 0

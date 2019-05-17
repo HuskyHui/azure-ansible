@@ -1,0 +1,32 @@
+#- block:
+#  - name: get_vm_facts
+#    setup:
+#    delegate_facts: True
+#    delegate_to: "{{ vm_name }}"
+#    register: azure_vm_facts
+
+#  - name: Getting instance id
+#    set_fact: 
+#      vm_id: "{{ azure_vm_facts.ansible_facts.ansible_machine_id }}"
+
+#  - name: Getting existing block devices
+#    set_fact:
+#      block_devices: "{{ azure_vm_facts.ansible_facts.ansible_devices.split(',')}}"
+
+#  - name: Getting available block device
+#    set_fact:
+#      device_name: "/dev/{{item}}"
+#    when: item not in block_devices
+#    with_items: "{{ devs[::-1] }}"
+  
+#  vars:
+#    devs: ['sdb','sdc','sdd','sde','sdf','sdg','sdh','sdi','sdj','sdk']
+#  when: vm_name is defined
+
+
+- azure_rm_managed_disk:
+    name: "{{ disk_name }}"
+    disk_size_gb: "{{ disk_size }}"
+    storage_account_type: "{{ disk_type }}"
+    managed_by: "{{ vm_name }}"
+    resource_group: "{{ rg }}"

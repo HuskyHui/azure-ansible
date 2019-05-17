@@ -1,0 +1,9 @@
+- block:
+    - include_tasks: sles_hostname.yml
+  when: sys_hostname != "" and sys_fqdn != ""
+
+- block:
+    - include_tasks: root_passwd.yml
+  when: os_root_passwd != ""
+
+- meta: flush_handlers

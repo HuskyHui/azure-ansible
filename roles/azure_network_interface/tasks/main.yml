@@ -1,0 +1,19 @@
+# tasks file for network_interface
+- fail: msg="Missing required parameter networ_interface_name or networ_interface_action"
+  when: network_interface_action is not defined or network_interface_name is not defined
+
+- block:
+    - include: network_interface_create.yml
+  when: network_interface_action == "create"
+
+- block:
+    - include: network_interface_delete.yml
+  when: network_interface_action == "delete"
+
+- block:
+    - include: network_interface_addsec_private_ip.yml
+  when: network_interface_action == "create_priv_ip"
+
+- block:
+    - include: network_interface_removesec_private_ip.yml
+  when: network_interface_action == "delete_priv_ip"

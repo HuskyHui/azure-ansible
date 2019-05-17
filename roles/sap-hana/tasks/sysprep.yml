@@ -1,0 +1,18 @@
+- name: Add sapinst group
+  group: name=sapinst state=present
+
+- name: Add root to sapinst
+  user: name=root groups=sapinst
+
+
+# virtual hostname configuration
+- name: Overriding default virtual ip
+  set_fact: 
+    virtual_ip: "{{ secondary_ip }}"
+  when: virtual_hostname != ansible_hostname and secondary_ip is defined
+
+- name: Add virtual host entry
+  lineinfile: 
+    dest: "/etc/hosts"
+    line: "{{ virtual_ip }} {{ virtual_hostname }}.{{ sys_fqdn }} {{ virtual_hostname }}"
+    regexp: "(^|\n){{ virtual_ip }} (.*)"

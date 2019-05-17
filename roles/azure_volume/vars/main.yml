@@ -1,0 +1,3 @@
+---
+# vars file for roles/azure_volume
+disk_type: Standard_LRS

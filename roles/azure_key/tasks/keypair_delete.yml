@@ -1,0 +1,17 @@
+- name: Delete private key from filesystem
+  file:
+    path: "{{ ssh_key_path }}/{{ key_name }}"
+    state: absent
+- name: Delete public key from filesystem
+  file:
+    path: "{{ ssh_key_path }}/{{ key_name }}.pub"
+    state: absent
+
+- name: az login
+  command: az login --service-principal --username  {{ principal_name }} --password {{ principal_password }}  --tenant {{ principal_tenant }}
+
+- name: Delete private key from Key vault
+  command: az keyvault secret delete --vault-name "{{ vault_name }}" --name "{{ key_name }}-private"
+
+- name: Delete public key from Key vault
+  command: az keyvault secret delete --vault-name "{{ vault_name }}" --name "{{ key_name }}-public"

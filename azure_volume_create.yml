@@ -1,0 +1,4 @@
+- hosts: localhost
+  gather_facts: False
+  roles:
+    - { role: azure_volume, volume_action: "create", delegate_facts: True }

@@ -1,0 +1,7 @@
+# tasks file for storage container
+- fail: msg="Missing required parameter networ_interface_name or networ_interface_action"
+  when: storage_container_action is not defined or container_name is not defined
+
+- block:
+    - include: storage_container_delete.yml
+  when: storage_container_action == "delete"

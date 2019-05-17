@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  tasks:
+    - name: az login
+      command: az login --service-principal --username 0ef4ce27-c793-466d-bf83-7807e7144062 --password e3ccc17f-bf3f-4252-84b1-8d42e6e39501  --tenant 1cf51555-fbcb-4b32-9e4f-4c1f7dd602f9
+    
+    - name: upload private key
+      command: az keyvault secret set --name {{ vm_name }}-private --vault-name poc-ssh-keypair --file ~/.ssh/ansible-keys/{{ vm_name }}
+
+    - name: upload public key
+      command: az keyvault secret set --name {{ vm_name }}-public --vault-name poc-ssh-keypair --file ~/.ssh/ansible-keys/{{ vm_name }}.pub

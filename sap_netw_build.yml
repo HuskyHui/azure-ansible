@@ -1,0 +1,48 @@
+# USAGE
+# time ansible-playbook -i inventory sap_netw_build_dev.yml --extra-vars "@vars_netw_generic.json" --extra-vars "{'vm_name':'test-netw01'}" 
+
+- hosts: localhost
+  vars:
+    azure_profile: "test_hosts"
+    hostgroup_name: "{{ azure_profile }}"
+    key_name: "{{ vm_name }}"
+    public_ip_name: "{{ vm_name }}"
+    network_interface_name: "{{ vm_name }}"
+    netw_exe_size: 20
+    install_size: 50
+    swap_size: 20
+
+  roles:
+    - { role: azure_vm, vm_action: "check", delegate_facts: True }
+    - { role: azure_key, key_action: "create", delegate_facts: True }
+    - { role: azure_public_ip, public_ip_action: "create", delegate_facts: True }
+    - { role: azure_network_interface, network_interface_action: "create", delegate_facts: True }
+    - { role: azure_vm, vm_action: "create", ssh_public_key_data: "{{ lookup('file', '{{ ssh_key_path }}/{{ vm_name }}.pub') }}", delegate_facts: True }
+    - { role: azure_network_interface, network_interface_action: "create_priv_ip", delegate_facts: True }
+    - { role: azure_volume, delegate_facts: True, volume_action: "create", disk_name: "{{ vm_name }}-swap", disk_size: "{{ swap_size }}" }
+    - { role: azure_volume, delegate_facts: True, volume_action: "create", disk_name: "{{ vm_name }}-netw-exe", disk_size: "{{ netw_exe_size }}" }
+    - { role: azure_volume, delegate_facts: True, volume_action: "create", disk_name: "{{ vm_name }}-install", disk_size: "{{ install_size }}" }
+
+- hosts: "{{ vm_name }}"
+  vars:
+    repo_type: "mount"
+    install_data_path: "/install"
+    install_log_path: "/usr/sap/install_log"
+    netw_exe_size: 20
+    install_size: 50
+    swap_size: 20
+  roles:
+   - { role: core, delegate_facts: True }
+   - { role: os_ip, delegate_facts: True, os_ip_action: "add_sec_ip", secondary_int_name: "virtualip" }
+   - { role: disk-fs, delegate_facts: True, disksize: "{{ swap_size }}", volname: "sysswap",  mountpoint: "none", fstype: "swap", mnt_opts: "defaults" }
+   - { role: disk2vg, delegate_facts: True, vg_action: "create", disk_sizes_gb: ["{{ netw_exe_size }}"], vg_name: "vgbin01" }
+   - { role: lvm_vol, delegate_facts: True, lv_action: "create", volname: "sap", vg_name: "vgbin01", lv_size: "100%FREE", mountpoint: "/mnt/netw/sap", fstype: "xfs", mnt_opts: "defaults", lv_opts: "" }
+   - { role: disk-fs, delegate_facts: True, disksize: "{{ install_size }}", volname: "sapinstall",  mountpoint: "/mnt{{ install_data_path }}", fstype: "ext4", mnt_opts: "defaults" }
+   - { role: fs-bind, delegate_facts: True, source: "/mnt/netw/sap", target: "/usr/sap" }
+   - { role: fs-bind, delegate_facts: True, source: "/usr/sap/sapmnt", target: "/sapmnt" }
+   - { role: fs-bind, delegate_facts: True, source: "/mnt{{ install_data_path }}", target: "{{ install_data_path }}" }
+   - { role: sap-netweaver, delegate_facts: True }
+
+- hosts: localhost
+  roles:
+    - { role: azure_volume, delegate_facts: True, volume_action: "delete", disk_name: "{{ vm_name }}-install" }

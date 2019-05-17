@@ -1,0 +1,12 @@
+- name: create Azure VM
+  hosts: localhost
+  gather_facts: False
+  vars:
+    azure_profie: "customer1"
+    hostgroup_name: "{{ azure_profile }}"
+    key_name: "{{ vm_name }}"
+    public_ip_name: "{{ vm_name }}"
+    network_interface_name: "{{ vm_name }}"
+    
+  roles:
+    - { role: azure_vm, vm_action: "check", delegate_facts: True }

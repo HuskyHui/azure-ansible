@@ -1,0 +1,4 @@
+- name: Set root password
+  user:
+     name: "root"
+     password: "{{ os_root_passwd | password_hash('sha512') }}"

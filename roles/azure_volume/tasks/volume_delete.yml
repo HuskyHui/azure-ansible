@@ -1,0 +1,10 @@
+- azure_rm_managed_disk:
+    name: "{{ disk_name }}"
+    #disk_size_gb: "{{ disk_size }}"
+    storage_account_type: "{{ disk_type }}"
+    resource_group: "{{ rg }}"
+
+- azure_rm_managed_disk:
+    name: "{{ disk_name }}"
+    resource_group: "{{ rg }}"
+    state: absent

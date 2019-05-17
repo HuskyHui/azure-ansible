@@ -1,0 +1,129 @@
+- name: Check whether the install path exists
+  stat: path="{{ install_data_path }}"
+  register: inst_path
+
+- name: Create installation directory if not exists
+  file:
+    path: "{{ install_data_path }}"
+    state: directory
+    mode: 0777
+  when: not inst_path.stat.exists
+
+- name: Check for last download
+  stat: path="{{ install_data_path }}/dnld_flag"
+  register: dnld_flag
+
+- block:
+#  - name: Download Files from http repo
+#    get_url: url="{{ repo_url }}{{ item }}" dest="{{ install_data_path }}" force=no tmp_dest="{{ install_data_path }}"
+#    when: repo_type == "http"
+#    with_items: "{{ hana_downloads }}"
+  
+#  - name: Download Files from s3 repo
+#    s3:
+#      bucket: "{{ s3_bucket }}"
+#      object: "{{ item }}"
+#      dest: "{{ install_data_path }}/{{ item.split('/')[-1] }}"
+#      mode: get
+#      region: "{{ ec2_region }}"
+#      ignore_nonexistent_bucket: True
+#    when: repo_type == "s3"
+#    with_items: "{{ hana_downloads }}"
+  - name: create mount point
+    file:
+      path: /mnt/media
+      state: directory
+      mode: 0777
+       
+
+  - name: mount the packages
+    shell:
+      mount -t cifs //ansiblepoceuw.file.core.windows.net/sapsoftware /mnt/media -o vers=3.0,username=ansiblepoceuw,password=FoR+acF65aPr2RLaLrFB832wXduHqEevFmYFwHGq9cR0JMRHe4JtGXi9IWoWkRoQ+s09auh4qdd5sAK92960aQ==,dir_mode=0777,file_mode=0777,sec=ntlmssp
+
+  - name: copy required packages
+    copy:
+      src: "/mnt/media/{{ item }}"
+      dest: "{{ install_data_path }}"
+      remote_src: yes
+#      when: repo_type == "mount"
+    with_items: "{{ hana_downloads }}"
+
+  - name: Set Downloadfile
+    file: path="{{ install_data_path }}/dnld_flag"  state=touch mode="u=rw,g=r,o=r"
+
+  tags:
+    - hana_download
+  when: dnld_flag.stat.exists == false and repo_type in ["mount"]
+
+- name: Check for last extraction
+  stat: path="{{ install_data_path }}/ext_flag"
+  register: ext_flag
+
+- block:
+  - name: chmod sapcar
+    file: path="{{ install_data_path }}/SAPCAR" owner=root group=sapinst mode=0775
+  
+  - name: Check for extracted files
+    stat: path="{{ hdb_server_path }}"
+    register: extract_db
+  
+  - name: extract SAPCAR Installer
+    shell: 'cd {{ install_data_path }} && ./SAPCAR -xvf /install/{{ hana_archive }}'
+    when: extract_db.stat.exists == false
+  
+  - name: Set permissions to install folder
+    file: path="{{ install_data_path }}" owner=root group=sapinst mode=0775 recurse=yes
+
+  - name: Set extract flag
+    file: path="{{ install_data_path }}/ext_flag"  state=touch mode="u=rw,g=r,o=r"
+
+  tags:
+    - hana_install
+  when: repo_type in ["mount"] and ext_flag.stat.exists == false 
+
+- name: Check for last installation
+  stat: path="{{ install_data_path }}/inst_flag"
+  register: inst_flag
+
+- block:
+  - name: set config file with SID,Hostname,InstanceNumber and Passwords
+    template: src=hana_config.j2 dest="{{ install_config_file }}" owner=root group=sapinst mode=0640
+    when: hana_version in ["100_122_4","100_122_5"]
+
+  - name: set config file with SID,Hostname,InstanceNumber and Passwords
+    template: src=hana_config_v2.j2 dest="{{ install_config_file }}" owner=root group=sapinst mode=0640
+    when: hana_version not in ["100_122_4","100_122_5"]
+    
+  - name: running Hana installer
+    shell: "cd {{ hdb_server_path }} && ./hdblcm --batch --configfile={{ install_config_file }} --ignore=check_signature_file"
+
+  - name: Set install flag
+    file: path="{{ install_data_path }}/inst_flag"  state=touch mode="u=rw,g=r,o=r"
+  tags:
+    - hana_install
+  when: not inst_flag.stat.exists
+
+# should be later moved to separate role and to top level playbook
+#
+- name: Unmount install mount
+  mount:
+    path: "{{ item }}"
+    state: unmounted
+  with_items:
+    - "{{ install_data_path }}"
+    - "/mnt{{ install_data_path }}"
+  when: repo_type in ["mount"]
+
+- name: Unmount install mount
+  mount:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ install_data_path }}"
+    - "/mnt{{ install_data_path }}"
+  when: repo_type in ["mount"]
+
+- name: Umount software packages
+  mount:
+    path: /mnt/media
+    state: unmounted

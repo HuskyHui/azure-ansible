@@ -1,0 +1,84 @@
+# check file to be present
+- set_fact:
+    local_inventory_path: "{{ playbook_dir }}/inventory"
+- set_fact:
+    local_inventory_file: "{{ local_inventory_path }}/hosts"
+- set_fact:
+    local_inventory_var_path: "{{ local_inventory_path }}/host_vars"
+- set_fact:
+    local_inventory_var_file: "{{ local_inventory_var_path }}/{{ vm_name }}"
+
+- name: Create inventory folder
+  file:
+    path: "{{ local_inventory_path }}"
+    mode: 0755
+    state: directory
+
+- name: Create inventory hostvars folder
+  file:
+    path: "{{ local_inventory_var_path }}"
+    mode: 0755
+    state: directory
+
+- block:
+  - stat: path="{{ local_inventory_file }}" 
+    register: ansible_hosts_file
+  
+  - name: Create hosts file
+    file: path="{{ local_inventory_file }}" state=touch
+    when: not ansible_hosts_file.stat.exists
+
+  - name: Create appropriate group
+    lineinfile: "dest={{ local_inventory_file }} line='[{{ hostgroup_name|default('test_hosts') }}]'"
+
+  - name: add ansible host entry
+    lineinfile: 
+      dest: "{{ local_inventory_file }}"
+      line: "{{ vm_name }}"
+      insertafter: '^\[{{ hostgroup_name|default("test_hosts") }}\]$'
+
+  - name: add ansible host connection variables
+    copy:
+      dest: "{{ local_inventory_var_file }}"
+      content: |
+        ansible_ssh_host: {{ az_vm.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}
+        ansible_ssh_private_key_file: {{ ssh_key_path }}{{ key_name }}
+        ansible_ssh_user: {{ default_user }}
+        ansible_become_pass: "{{ default_password }}"
+        ansible_connection: ssh
+        ansible_ssh_port: 22
+        #ansible_become: True
+        ansible_become_method: sudo
+        ansible_become_user: root
+        vm_id: {{ az_vm.ansible_facts.azure_vm.properties.vmId }}
+
+  - name: Adding host to dynamic inventory
+    add_host:
+      hostname: "{{ vm_name }}"
+      ansible_ssh_host: "{{ az_vm.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
+      ansible_ssh_private_key_file: "{{ ssh_key_path }}{{ key_name }}"
+      ansible_ssh_user: "{{ default_user }}"
+      ansible_become_pass: "{{ default_password }}"
+      ansible_connection: ssh
+      ansible_ssh_port: 22
+      ansible_become: True
+      ansible_become_method: sudo
+      ansible_become_user: root
+      vm_id: "{{ az_vm.ansible_facts.azure_vm.properties.vmId }}"
+  
+#  - name: Refreshing ansible inventory
+#    meta: refresh_inventory
+  when: vm_action == "create" and not vm_tag_exists
+
+- block:
+  - name: delete ansible host
+    lineinfile: 
+      dest: "{{ local_inventory_file }}"
+      line: "{{ vm_name }}" 
+      state: absent
+
+  - name: delete variables from host_vars
+    file:
+      path: "{{ local_inventory_var_file }}"
+      state: absent
+  when: vm_action == "delete"

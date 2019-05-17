@@ -1,0 +1,77 @@
+- name: Check for existing download
+  stat: path={{ hana_studio_dnld_flag }}
+  register: dnld_flag
+  tags:
+    - hana_studio_download
+
+- block:
+#  - name: Download Files
+#    get_url: url={{ repo_url }}{{ item }} dest=/install force=no tmp_dest=/install
+#    with_items: "{{ hana_studio_downloads }}"
+#    tags:
+#      - hana_studio_download
+  - name: create mount point
+    file:
+      path: /mnt/media
+      state: directory
+      mode: 0777
+       
+
+  - name: mount the packages
+    shell:
+      mount -t cifs //ansiblepoceuw.file.core.windows.net/sapsoftware /mnt/media -o vers=3.0,username=ansiblepoceuw,password=FoR+acF65aPr2RLaLrFB832wXduHqEevFmYFwHGq9cR0JMRHe4JtGXi9IWoWkRoQ+s09auh4qdd5sAK92960aQ==,dir_mode=0777,file_mode=0777,sec=ntlmssp
+
+  - name: copy required packages
+    copy:
+      src: "/mnt/media/{{ item }}"
+      dest: "{{ install_data_path }}"
+      remote_src: yes
+    with_items: "{{ hana_studio_downloads }}"
+
+  - name: chmod sapcar
+    file: path=/install/SAPCAR owner=root group=sapinst mode=0775
+    tags:
+      - hana_studio_download
+
+  - name: Set Downloadfile
+    file: path="{{ hana_studio_dnld_flag }}"  state=touch mode="u=rw,g=r,o=r"
+    tags:
+      - hana_studio_download
+  when: not dnld_flag.stat.exists
+
+- name: Check for existing installation
+  stat: path={{ hana_studio_inst_flag }}
+  register: inst_flag
+  tags:
+    - hana_studio_install
+
+- block:
+  - name: Check for extracted files
+    stat: path=/install/SAP_HANA_STUDIO
+    register: extract_db
+    tags:
+      - hana_studio_install
+
+  - name: extract SAPCAR Installer
+    shell: 'cd /install && ./SAPCAR -xvf /install/{{ hana_studio_archive }}'
+    when: not extract_db.stat.exists
+    tags:
+      - hana_studio_install
+
+  - name: Set permissions to install folder
+    file: path=/install/ owner=root group=sapinst mode=0775 recurse=yes
+    tags:
+      - hana_studio_install
+
+  - name: running Hana installer
+    shell: "cd /install/SAP_HANA_STUDIO && ./hdbinst -a studio -p /usr/sap/hdbstudio --features=all -b"
+    register: hana_install_cmd
+    tags:
+      - hana_studio_install
+
+  - name: Set InstallFile
+    file: path="{{ hana_studio_inst_flag }}"  state=touch mode="u=rw,g=r,o=r"
+    when: hana_install_cmd|succeeded
+    tags:
+      - hana_studio_install
+  when: not inst_flag.stat.exists

@@ -1,0 +1,5 @@
+- name: Add sapinst group
+  group: name=sapinst state=present
+
+- name: Add root to sapinst
+  user: name=root groups=sapinst

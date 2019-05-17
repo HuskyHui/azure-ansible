@@ -1,0 +1,6 @@
+- name: delete sec private ip
+  hosts: localhost
+  vars:
+    network_interface_name: "{{ vm_name }}"
+  roles:
+    - { role: azure_network_interface, network_interface_action: "delete_priv_ip", delegate_facts: True }

@@ -1,0 +1,36 @@
+- fail: msg="Missing required parameter-> disk_size_gb or vg_name or vg_action"
+  when: disk_sizes_gb is not defined or vg_name is not defined or vg_action is not defined
+
+- block:
+  - set_fact:
+      free_disks: ""
+
+  - include_tasks: get_free_disks.yml
+    with_items: "{{ disk_sizes_gb }}"
+    loop_control:
+      loop_var: disk_size
+  
+  # remove first comma
+  - set_fact:
+      free_disks: "{{ free_disks[1:] }}"
+     
+  - set_fact:
+      list_free_disks: "{{ free_disks.split(',') | unique }}"
+
+  - debug: var=list_free_disks 
+
+  - set_fact:
+      free_disks: ""
+
+  - set_fact: 
+      free_disks: "{{ free_disks }},{{ item }}"
+    with_items: "{{ list_free_disks }}"
+  # remove first comma
+  - set_fact:
+      free_disks: "{{ free_disks[1:] }}"
+
+  - debug: var=free_disks
+    
+
+  - include_tasks: add_disks_to_vg.yml
+  when: vg_action == "create"

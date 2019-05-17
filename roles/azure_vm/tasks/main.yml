@@ -1,0 +1,26 @@
+---
+- fail: msg='Missing required parameter vm_action'
+  when: vm_action is not defined
+
+- fail: msg='Missing required parameter for deleting vm-> vm_name or vm_id'
+  when: vm_action == "delete" and vm_ids is not defined and vm_name is not defined
+
+- fail: msg='Missing required parameter for creating vm-> vm_name'
+  when: vm_action == "create" and vm_name is not defined
+
+#- fail: msg='Missing required parameter for creating vm'
+#  when: vm_action == "create"
+
+
+- block:
+    - include: vm_create.yml
+  when: vm_action == "create" and not vm_tag_exists
+
+- block:
+    - include: vm_delete.yml
+  when: vm_action == "delete"
+
+- block:
+    - include: check_vm_exists.yml
+  when: vm_action == "check"
+- include: update_inventory.yml

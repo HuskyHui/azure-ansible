@@ -1,0 +1,106 @@
+- name: Check if Mountpoint already used
+  shell: mount | grep {{ mountpoint }} | tee
+  register: check_mountpoint
+
+- block:
+  - name: Check for suitable Volume by size
+    script: disk-detection.sh {{ disksize }}G
+    register: disk_detection_disksize
+    when: disksize is defined
+  
+  - name: Check for suitable Volume by cloudstack device_id
+    script: getDevNameById.py {{ cs_vol_device_id }}
+    register: disk_detection_deviceid
+    when: cs_vol_device_id is defined and disksize is not defined
+
+  - debug: msg=" i am here"
+
+  - debug: msg="no suitable volumes found skipping filesystem"
+    when: (disksize is defined and disk_detection_disksize.stdout_lines|length == 0) or
+          (disksize is not defined and disk_detection_deviceid.stdout_lines|length == 0) 
+
+  - block: 
+    - name: Refresh Facts
+      action: setup
+
+    - set_fact: mkfs_opts="-m0 -L {{ volname }}"
+      when: fstype|lower in ["ext2","ext3","ext4"]
+
+    - set_fact: mkfs_opts="-L {{ volname }}"
+      when: fstype|lower not in ["ext2","ext3","ext4"]
+
+    - block: 
+      - name: Format Filesystem
+        filesystem: fstype="{{ fstype }}" dev="{{ disk_detection_disksize.stdout_lines[1] }}" opts="{{ mkfs_opts }}"
+        register: fs_ready
+
+      - name: Creating Mountpoint
+        file: path="{{ mountpoint }}" state=directory mode=755
+        register: path_ready
+
+      - name: Refreshing kernel udev parameters
+        shell: "udevadm trigger --action=change"
+
+      - pause: prompt="Waiting for udev reload" seconds=5
+
+      - name: Mounting filesystem
+        mount: name="{{ mountpoint }}"  src="LABEL={{ volname }}" fstype="{{ fstype }}" opts="{{ mnt_opts }}" state=mounted
+        register: mounted
+        when: path_ready|success and fs_ready|success
+      when: fstype|lower != "swap"
+
+    - block:
+      - name: make swap on disk
+        shell: "mkswap -L {{ volname }} {{ disk_detection_disksize.stdout_lines[1] }}"
+        register: mkswap
+
+      - debug: var=mkswap
+
+      - name: adding entry in fstab
+        mount: name="{{ mountpoint }}"  src="LABEL={{ volname }}" fstype="{{ fstype }}" opts="{{ mnt_opts }}" state=present
+        when: mkswap.stderr == ""
+
+      - name: Refreshing kernel udev parameters
+        shell: "udevadm trigger --action=change"
+
+      - pause: prompt="Waiting for udev reload" seconds=5
+
+      - name: enable swap
+        shell: "swapon -L {{ volname }}"
+
+      when: fstype|lower == "swap"
+
+    when: disksize is defined and disk_detection_disksize.stdout_lines|length > 0 
+
+  - block: 
+    - name: Refresh Facts
+      action: setup
+
+    - set_fact: mkfs_opts="-m0 -L {{ volname }}"
+      when: fstype|lower in ["ext2","ext3","ext4"]
+
+    - set_fact: mkfs_opts="-L {{ volname }}"
+      when: fstype|lower not in ["ext2","ext3","ext4"]
+ 
+    - debug: msg="test"
+    - name: Format Filesystem
+      filesystem: fstype="{{ fstype }}" dev="{{ disk_detection_disksize.stdout_lines[1] }}" opts="{{ mkfs_opts }}"
+      register: fs_ready
+
+
+    - name: Creating Mountpoint
+      file: path="{{ mountpoint }}" state=directory mode=755
+      register: path_ready
+    
+    - name: Refreshing kernel udev parameters
+      shell: "udevadm trigger --action=change"
+
+    - pause: prompt="Waiting for udev reload" seconds=5
+    
+    - name: Mounting filesystem
+      mount: name="{{ mountpoint }}"  src="LABEL={{ volname }}" fstype="{{ fstype }}" opts="{{ mnt_opts }}" state=mounted
+      register: mounted
+      when: path_ready|success and fs_ready|success
+ 
+    when: disksize is not defined and disk_detection_deviceid.stdout_lines|length > 0
+  when: check_mountpoint.stdout == ""

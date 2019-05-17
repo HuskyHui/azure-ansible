@@ -1,0 +1,9 @@
+# following step takes only required number of disks of the same size
+
+- debug: var=free_disks
+- debug: var=disk_sizes_gb
+
+- lvg:
+    vg: "{{ vg_name }}"
+    pvs: "{{ free_disks }}"
+  when: free_disks|length > 0

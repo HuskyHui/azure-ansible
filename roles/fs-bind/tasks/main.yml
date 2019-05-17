@@ -1,0 +1,7 @@
+### For firewall the following variables
+#### fw_action=[create|delete]
+#### are OPTIONAL: rule_direction=[egress|ingress] - default is ingress, cs_zone=EU-GER-01, src_addr=0.0.0.0/0, proto=[tcp,udp,icmp,all->only with egress rules] default-> tcp
+#### for ingress: cs_domain, cs_project, cs_public_ipv4, start_port, end_port
+#### for egress: cs_domain, cs_project, cs_network,
+- block:
+    - include: tasks/fs-bind.yml

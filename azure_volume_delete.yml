@@ -1,0 +1,11 @@
+# Deltes volume in aws ec2
+# Vars
+## REQUIRED
+# volume_action: delete
+# disk_name: the name of the disk
+# --extra-vars "{'disk_name':'ansible_test_vol1'}"
+
+- hosts: localhost
+  gather_facts: False
+  roles:
+    - { role: azure_volume, volume_action: "delete", delegate_facts: True }

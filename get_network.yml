@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  vars:
+    private_ip: "{{ poctest03_nw.ansible_facts.azure_networkinterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
+  tasks:
+  - name: Get facts by name
+    azure_rm_networkinterface_facts:
+      resource_group: "{{ rg }}"
+      name: testhdb01
+    register: poctest03_nw 

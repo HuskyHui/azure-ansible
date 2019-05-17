@@ -1,0 +1,10 @@
+- name: delete Azure VM
+  hosts: localhost
+  gather_facts: False
+  vars:
+    key_name: "{{ vm_name }}"
+    public_ip_name: "{{ vm_name }}"
+  roles:
+    - { role: azure_vm, vm_action: "delete", delegate_facts: True }
+    - { role: azure_key, key_action: "delete", delegate_facts: True }
+    - { role: azure_public_ip, public_ip_action: "delete", delegate_facts: True }

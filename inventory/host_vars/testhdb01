@@ -1,0 +1,10 @@
+ansible_ssh_host: 10.164.53.5
+ansible_ssh_private_key_file: ~/.ssh/ansible-keys/testhdb01
+ansible_ssh_user: geadmin
+ansible_become_pass: "Welcome123!@"
+ansible_connection: ssh
+ansible_ssh_port: 22
+#ansible_become: True
+ansible_become_method: sudo
+ansible_become_user: root
+vm_id: be1ba02a-eb26-43c2-b904-e4c8dd925bc5

@@ -1,0 +1,14 @@
+{
+ "azure_profile":"test_hosts", 
+ "hana_version":"latest",
+ "vpc_subnet_id":"subnet-6569960e", 
+ "system_usage":"dev",
+ "db_size_gb":"64", 
+ "hana_sid":"AHD",
+ "hana_instance_num":"00", 
+ "hana_passwd_all":"hd_pwd_1BOa", 
+ "sys_hostname":"tsthd0",
+ "sys_fqdn":"awt-sap.os.itelligence.de",
+ "virtual_hostname":"tsthdv0",
+ "os_root_passwd":"Initial12345"
+}

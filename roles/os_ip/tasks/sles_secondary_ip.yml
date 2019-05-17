@@ -1,0 +1,24 @@
+- block:
+  - name: Add secondary ip network configuration
+    blockinfile:
+      path: "/etc/sysconfig/network/ifcfg-{{ eth_interface|default(ansible_default_ipv4.interface) }}"
+      block: |
+        IPADDR_0='{{ secondary_ip }}'
+        NETMASK_0='{{ secondary_ip_netmask|default(ansible_default_ipv4.netmask) }}'
+        LABEL_0='{{ secondary_int_name|default('0') }}'
+    notify:
+      - Restart Network
+  when: os_ip_action == "add_sec_ip" and secondary_ip is defined
+
+- block:
+  - name: Remove secondary ip network configuration
+    blockinfile:
+      path: "/etc/sysconfig/network/ifcfg-{{ eth_interface|default(ansible_default_ipv4.interface) }}"
+      block: |
+        IPADDR_0='{{ secondary_ip }}'
+        NETMASK_0='{{ secondary_ip_netmask|default(ansible_default_ipv4.netmask) }}'
+        LABEL_0='{{ secondary_int_name|default('0') }}'
+      state: absent
+    notify:
+      - Restart Network
+  when: os_ip_action == "del_sec_ip" and secondary_ip is defined

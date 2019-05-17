@@ -1,0 +1,8 @@
+- hosts: localhost
+  tasks:
+  - name: Remove container foo
+    azure_rm_storageblob:
+      resource_group: "{{ rg }}"
+      storage_account_name: "{{ storage_account }}"
+      container: "{{ vm_name }}"
+      state: absent

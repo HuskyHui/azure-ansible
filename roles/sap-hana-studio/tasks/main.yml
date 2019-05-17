@@ -1,0 +1,5 @@
+- include: tasks/sysprep.yml
+
+- block:
+    - include: tasks/app_install.yml
+  when: ansible_os_family == "Suse"

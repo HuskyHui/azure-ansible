@@ -1,0 +1,23 @@
+{
+ "azure_profile":"test_hosts", 
+ "vpc_subnet_id":"subnet-6569960e", 
+ "system_usage":"prod",
+ "s4hana_version":"1610",
+ "sapkernel_version":"7_49",
+ "swpm_version":"1_0_SP2",
+ "hdbclient_version":"200_024_0",
+ "sys_hostname":"tsts4",
+ "sys_fqdn":"awt-sap.os.itelligence.de",
+ "virtual_hostname":"tsts4v",
+ "abap_ascs_instance_num":"01",
+ "abap_schema_name":"SAPABAP1",
+ "abap_ci_num":"00",
+ "master_passwd_all":"s4_pwd_1BOa",
+ "sap_sid":"AED",
+ "hdb_ip":"10.164.53.6",
+ "hdb_hostname":"tsthdv0",
+ "hana_sid":"AHD",
+ "hana_instance_num":"00",
+ "hana_passwd_all":"hd_pwd_1BOa",
+ "os_root_passwd":"Initial12345"
+}

@@ -1,0 +1,6 @@
+- hosts: localhost
+  tasks:
+    - name: Get facts for one managed disk
+      azure_rm_managed_disk_facts:
+        name: ansible-test
+        resource_group: "{{ rg }}"

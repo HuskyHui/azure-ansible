@@ -1,0 +1,5 @@
+- name: Delete network interface
+  azure_rm_networkinterface:
+    resource_group: "{{ rg }}"
+    name: "{{ network_interface_name }}"
+    state: absent

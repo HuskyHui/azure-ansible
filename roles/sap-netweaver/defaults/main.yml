@@ -1,0 +1,86 @@
+# these variables are default ones, may be overriden by extra-vars
+netweaver_version: "7_5"
+sapkernel_version: "7_49"
+swpm_version: "1_0_SP2"
+hdbclient_version: "200_024_0"
+
+#netweaver_export_archive: "NW_7.5_Installation_Export_51050829_3.SAR"
+#netweaver_export_archive_folder: "NW_7.5_Installation_Export_51050829_3"
+#sapkernel_archive: "SAP_Kernel_7.49_Linux_x86_64_51051432_3.SAR"
+#sapkernel_archive_folder: "SAP_Kernel_7.49_Linux_x86_64_51051432_3"
+#swpm_archive: "SWPM_1.0_SP20_06.SAR"
+#swpm_archive_folder: "SWPM_1.0_SP20_06"
+#hdb_client_archive: "HDB_CLIENT_LINUX_X86_64.SAR"
+#hdb_client_archive_folder: "HDB_CLIENT_LINUX_X86_64"
+#netweaver_downloads:
+#  - "SAP_automated_installation/SAP/SAP_NW_7.5/{{ netweaver_export_archive }}"
+#  - "SAP_automated_installation/SAP/SAP_NW_7.5/{{ sapkernel_archive }}"
+#  - "SAP_automated_installation/SAP/{{ swpm_archive }}"
+#  - "SAP_automated_installation/Database/HDB_2.00.020.00/{{ hdb_client_archive }}"
+#  - "hana/SAPCAR"
+repo_type: "mount"
+sapkernel_archive: "{{ sapkernel_dnld_map[sapkernel_version].path.split('/')[-1] }}"
+sapkernel_archive_folder: "{{ sapkernel_dnld_map[sapkernel_version].folder }}"
+swpm_archive: "{{ swpm_dnld_map[swpm_version].path.split('/')[-1] }}"
+swpm_archive_folder: "{{ swpm_dnld_map[swpm_version].folder }}"
+hdb_client_archive: "{{ hana_client_dnld_map[hdbclient_version].path.split('/')[-1] }}"
+hdb_client_archive_folder: "{{ hana_client_dnld_map[hdbclient_version].folder }}"
+netweaver_export_archive: "{{ netw_export_dnld_map[netweaver_version].path[0].split('/')[-1] }}"
+netweaver_export_archive_folder: "{{ netw_export_dnld_map[netweaver_version].folder }}"
+netweaver_downloads:
+  - "{{ netw_export_dnld_map[netweaver_version].path }}"
+  - "{{ sapkernel_dnld_map[sapkernel_version].path }}"
+  - "{{ sapkernel_dnld_map[sapkernel_version].exe_archives }}"
+  - "{{ swpm_dnld_map[swpm_version].path }}"
+  - "{{ hana_client_dnld_map[hdbclient_version].path }}"
+  - "SAPCAR"
+
+virtual_hostname: "{{ ansible_hostname }}"
+virtual_ip: "{{ ansible_default_ipv4.address }}"
+sap_sid: "AED"
+master_passwd_all: "BIT.netw2016"
+hana_sid: "AHD"
+hana_instance_num: "00"
+hana_passwd_all: "BIT.hana2016"
+hdb_ip: ""
+hdb_hostname: "test-hd0"
+abap_ascs_instance_num: "01"
+abap_schema_name: "SAPABAP1"
+abap_ci_num: "00"
+
+system_usage: "prod"
+
+install_data_path: "/install"
+install_log_path: "/usr/sap/install_log"
+# this vars are combination of multiple vars and are NOT considered to be overriden by extra-vars
+install_config_file: "{{ install_data_path }}/configfile"
+
+swpm_bin: "{{ install_data_path }}/{{ swpm_archive_folder }}/sapinst"
+sapinst_load: "{{ install_data_path }}/{{ netweaver_export_archive_folder }}"
+sapinst_kernel: "{{ install_data_path }}/{{ sapkernel_archive_folder }}"
+sapinst_rdbms: "{{ install_data_path }}/{{ hdb_client_archive_folder }}"
+nw_crypto_file: "{{ install_data_path }}/{{ sapkernel_dnld_map[sapkernel_version].subfolder_archives.nw_crypto_file }}"
+nw_igs_exesar: "{{ install_data_path }}/{{ sapkernel_dnld_map[sapkernel_version].subfolder_archives.nw_igs_exesar }}"
+nw_igs_helpersar: "{{ install_data_path }}/{{ sapkernel_dnld_map[sapkernel_version].subfolder_archives.nw_igs_helpersar }}"
+nw_exe_dbsar: "{{ install_data_path }}/{{ sapkernel_dnld_map[sapkernel_version].subfolder_archives.nw_exe_dbsar }}"
+nw_exesar: "{{ install_data_path }}/{{ sapkernel_dnld_map[sapkernel_version].subfolder_archives.nw_exesar }}"
+
+#swpm_bin: "{{ install_data_path }}/{{ swpm_archive_folder }}/sapinst"
+#sapinst_load: "{{ install_data_path }}/{{ netweaver_export_archive_folder }}"
+##SAPINST.CD.PACKAGE.LOAD = /mnt/sap_media/NW_7.5_Installation_Export_51050829_3
+#sapinst_kernel: "{{ install_data_path }}/{{ sapkernel_archive_folder }}"
+##SAPINST.CD.PACKAGE.KERNEL = /mnt/sap_media/SAP_Kernel_7.49_Linux_x86_64_51051432_3
+#sapinst_rdbms: "{{ install_data_path }}/{{ hdb_client_archive_folder }}"
+##SAPINST.CD.PACKAGE.RDBMS = /mnt/sap_media/HDB_2.00.020.00/DATA_UNITS/HDB_CLIENT_LINUX_X86_64
+#nw_crypto_file: "{{ sapinst_kernel }}/DATA_UNITS/K_749_U_LINUX_X86_64/DBINDEP/SAPEXE.SAR"
+##NW_SAPCrypto.SAPCryptoFile = /mnt/sap_media/SAP_Kernel_7.49_Linux_x86_64_51051432_3/DATA_UNITS/K_749_U_LINUX_X86_64/DBINDEP/SAPEXE.SAR
+#nw_igs_exesar: "{{ sapinst_kernel }}/DATA_UNITS/K_749_U_LINUX_X86_64/DBINDEP/IGSEXE.SAR"
+##NW_Unpack.igsExeSar = /mnt/sap_media/SAP_Kernel_7.49_Linux_x86_64_51051432_3/DATA_UNITS/K_749_U_LINUX_X86_64/DBINDEP/IGSEXE.SAR
+#nw_igs_helpersar: "{{ sapinst_kernel }}/DATA_UNITS/K_749_U_LINUX_X86_64/DBINDEP/IGSHELPER.SAR"
+##NW_Unpack.igsHelperSar = /mnt/sap_media/SAP_Kernel_7.49_Linux_x86_64_51051432_3/DATA_UNITS/K_749_U_LINUX_X86_64/DBINDEP/IGSHELPER.SAR
+#nw_exe_dbsar: "{{ sapinst_kernel }}/DATA_UNITS/K_749_U_LINUX_X86_64/HDB/SAPEXEDB.SAR"
+##NW_Unpack.sapExeDbSar = /mnt/sap_media/SAP_Kernel_7.49_Linux_x86_64_51051432_3/DATA_UNITS/K_749_U_LINUX_X86_64/HDB/SAPEXEDB.SAR
+#nw_exesar: "{{ sapinst_kernel }}/DATA_UNITS/K_749_U_LINUX_X86_64/DBINDEP/SAPEXE.SAR"
+##NW_Unpack.sapExeSar = /mnt/sap_media/SAP_Kernel_7.49_Linux_x86_64_51051432_3/DATA_UNITS/K_749_U_LINUX_X86_64/DBINDEP/SAPEXE.SAR
+#
+##sysusr_passwd: "BIT.hana2016" 

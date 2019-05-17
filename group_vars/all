@@ -1,0 +1,151 @@
+location: "westeurope"
+azure_instance: "Standard_E32_v3"
+subscription_id: dab95b88-dea7-448b-8ba5-99d4aa7b71b5
+client_id: d96d5b2d-a754-4c67-9e56-153d2904158d
+secret: EEbUiTdzBkzxV9uK2BYAZz5JNI73mg61X4xrCiNLyWM=
+tenant: 1cf51555-fbcb-4b32-9e4f-4c1f7dd602f9
+rg: AnsiblePOC-Hosting-EUW-01-rg
+vnet: AnsiblePOC-EUW-APPHOSTING-10.164.53.0_25-vnet
+vnet_subnet: Appserver-10.164.53.0_26-subnet
+sec_ng: Appserver-10.164.53.0_26-nsg
+storage_account: ansiblepoceuw
+playbook_dir: /etc/ansible
+ssh_key_path: "~/.ssh/ansible-keys/"
+vault_name: poc-ssh-keypair
+principal_name: 0ef4ce27-c793-466d-bf83-7807e7144062
+principal_password: e3ccc17f-bf3f-4252-84b1-8d42e6e39501
+principal_tenant: 1cf51555-fbcb-4b32-9e4f-4c1f7dd602f9
+default_user: geadmin
+default_password: Welcome123!@
+
+
+hana_size_map:
+    'prod':
+        '256': 
+            'instance_type': 'Standard_E32_v3'
+            'sap_size': 20 
+            'shared_size': 50
+            'data_size': 600
+            'log_size': 300
+            'data_log_pv_size': 300
+        '512':
+            'instance_type': 'r4.16xlarge'
+            'sap_size': 20 
+            'shared_size': 200
+            'data_size': 800
+            'log_size': 400
+            'data_log_pv_size': 400
+        '1024':
+            'instance_type': 'x1.16xlarge'
+            'sap_size': 20 
+            'shared_size': 300
+            'data_size': 1600
+            'log_size': 500
+            'data_log_pv_size': 700
+        '2048':
+            'instance_type': 'x1.32xlarge'
+            'sap_size': 20 
+            'shared_size': 300
+            'data_size': 2750
+            'log_size': 500
+            'data_log_pv_size': 1085
+        '4096':
+            'instance_type': 'x1.e32xlarge'
+            'sap_size': 20 
+            'shared_size': 300
+            'data_size': 5640
+            'log_size': 500
+            'data_log_pv_size': 2048
+    'dev': 
+        '64':
+            'instance_type': 'Standard_E32_v3'
+            'sap_size': 20 
+            'shared_size': 50
+            'data_size': 100
+            'log_size': 50
+            'data_log_pv_size': 50
+        '128':
+            'instance_type': 'Standard_E32_v3'
+            'sap_size': 20 
+            'shared_size': 50
+            'data_size': 200
+            'log_size': 100
+            'data_log_pv_size': 100
+        '256':
+            'instance_type': 'r4.8xlarge'
+            'sap_size': 20 
+            'shared_size': 50
+            'data_size': 275
+            'log_size': 100
+            'data_log_pv_size': 125
+        '512':
+            'instance_type': 'r4.16xlarge'
+            'sap_size': 20 
+            'shared_size': 200
+            'data_size': 500
+            'log_size': 250
+            'data_log_pv_size': 250
+        '1024':
+            'instance_type': 'x1.16xlarge'
+            'sap_size': 20 
+            'shared_size': 300
+            'data_size': 1200
+            'log_size': 300
+            'data_log_pv_size': 500
+        '2048':
+            'instance_type': 'x1.32xlarge'
+            'sap_size': 20 
+            'shared_size': 300
+            'data_size': 2100
+            'log_size': 300
+            'data_log_pv_size': 800
+        '4096':
+            'instance_type': 'x1.e32xlarge'
+            'sap_size': 20 
+            'shared_size': 300
+            'data_size': 4200
+            'log_size': 300
+            'data_log_pv_size': 1500
+hana_dnld_map:
+  'latest':
+    'path': 'SAP_automated_installation/Database/HANA/HDB_2.00.024.00/IMDB_SERVER20_024_0-80002031.SAR'
+    'folder': 'SAP_HANA_DATABASE'
+  '200_024_0':
+    'path': 'SAP_automated_installation/Database/HANA/HDB_2.00.024.00/IMDB_SERVER20_024_0-80002031.SAR'
+    'folder': 'SAP_HANA_DATABASE'
+hana_client_dnld_map:
+  '200_024_0':
+    'path': "SAP_automated_installation/Database/HANA/HDB_2.00.024.00/IMDB_CLIENT20_003_134-80002082.SAR"
+    'folder': "SAP_HANA_CLIENT"
+sapkernel_dnld_map:
+  '7_49':
+    'path': "SAP_automated_installation/SAP/SAP_Kernel/SAP_Kernel_7.49_Linux_x86_64_51051432_3.SAR"
+    'folder': "SAP_Kernel_7.49_Linux_x86_64_51051432_3"
+    'exe_archives':
+      - "SAP_automated_installation/SAP/SAP_Kernel/IGS.sar"
+      - "SAP_automated_installation/SAP/SAP_Kernel/IGSHELPER.sar"
+      - "SAP_automated_installation/SAP/SAP_Kernel/SAPEXEDB_500-70001624.SAR"
+      - "SAP_automated_installation/SAP/SAP_Kernel/SAPEXE_500-70001625.SAR"
+    'subfolder_archives':
+       nw_crypto_file: "SAPEXE_500-70001625.SAR"
+       nw_igs_exesar: "IGS.sar"
+       nw_igs_helpersar: "IGSHELPER.sar"
+       nw_exe_dbsar: "SAPEXEDB_500-70001624.SAR"
+       nw_exesar: "SAPEXE_500-70001625.SAR"
+swpm_dnld_map:
+  '1_0_SP2':
+    'path': "SAP_automated_installation/SAP/SWPM10SP23_2-20009701.SAR"
+    'folder': "SWPM10SP23_2-20009701"
+s4_export_dnld_map:
+  '1610':
+    'path':
+      - "SAP_automated_installation/SAP/SAP_S4_1610/51050947_EXP1_part1.exe"
+      - "SAP_automated_installation/SAP/SAP_S4_1610/51050947_EXP1_part2.rar"
+      - "SAP_automated_installation/SAP/SAP_S4_1610/51050947_EXP1_part3.rar"
+      - "SAP_automated_installation/SAP/SAP_S4_1610/51050947_EXP1_part4.rar"
+    'folder': "DATA_UNITS"
+netw_export_dnld_map:
+  '7_5':
+    'path':
+      - "SAP_automated_installation/SAP/SAP_NW_7.5/NW_7.5_Installation_Export_51050829_3.ZIP"
+    'folder': "NW_7.5_Installation_Export_51050829_3"

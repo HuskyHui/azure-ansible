@@ -1,0 +1,12 @@
+---
+# tasks file for public_ip
+- fail: msg="Missing required parameter public_ip_name or public_ip_action"
+  when: public_ip_action is not defined or public_ip_name is not defined
+
+- block:
+    - include: public_ip_create.yml
+  when: public_ip_action == "create"
+
+- block:
+    - include: public_ip_delete.yml
+  when: public_ip_action == "delete"

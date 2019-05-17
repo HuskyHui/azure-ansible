@@ -1,0 +1,6 @@
+#  - name: set autostart in profile
+#    replace:
+#      path: "/usr/sap/{{ hana_sid }}/SYS/profile/{{ hana_sid }}_HDB{{ hana_instance_num }}_{{ virtual-hostname }}"
+#      regexp: 'Autostart = 0'
+#      replace: 'Autostart = 1'
+#      backup: no

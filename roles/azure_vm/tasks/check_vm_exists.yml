@@ -1,0 +1,28 @@
+- set_fact: vm_tag_exists=False
+
+- name: check if vm exists in inventory
+  lineinfile:
+    line: "{{ vm_name }}"
+    dest: /etc/ansible/inventory/hosts
+    state: absent
+  check_mode: yes
+  register: inventory_tags
+
+
+- name: Retrieve vm_name on an instance
+  azure_rm_virtualmachine_facts:
+    resource_group: "{{ rg }}"
+    name: "{{ vm_name }}"
+  register: azure_tags
+  when: vm_name is defined
+
+
+
+- set_fact: vm_tag_exists=True
+  when: (azure_tags.vms[0] is defined and azure_tags.vm[0].name == vm_name) or
+        (inventory_tags is defined and inventory_tags.found == 1)
+
+
+
+- debug:
+    var: vm_tag_exists

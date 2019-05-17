@@ -1,0 +1,6 @@
+- name: Remove storage container
+  azure_rm_storageblob:
+    resource_group: "{{ rg }}"
+    storage_account_name: "{{ storage_account }}"
+    container: "{{ container_name }}"
+    state: absent

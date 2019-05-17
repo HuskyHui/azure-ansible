@@ -1,0 +1,7 @@
+- fail: msg="Missing required paramete-> volname, vg_name, lv_size, mountpoint, fstype, mnt_opts"
+  when: lv_action is not defined or volname is not defined or vg_name is not defined or lv_size is not defined or mountpoint is not defined or fstype is not defined or mnt_opts is not defined
+
+- block:
+  - include: create_lv.yml
+  - include: format_mount_filesystem.yml
+  when: lv_action == "create"

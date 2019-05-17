@@ -1,0 +1,2 @@
+#- name: restart suse sshd
+#  service: name=sshd state=reloaded

@@ -1,0 +1,18 @@
+---
+# tasks file for roles/azure_volume
+- fail: msg="disk_size must be defined when action is create"
+  when: volume_action == "create" and disk_size is not defined
+
+- fail: msg="disk_name must be defined when action is delete"
+  when: volume_action == "delete" and disk_name is not defined
+
+- block:
+    - include: check_volume_exists.yml
+
+- block:
+    - include: volume_create.yml
+  when: volume_action == "create" and (not volume_tag_exists)
+
+- block:
+    - include: volume_delete.yml
+  when: volume_action == "delete" and volume_tag_exists

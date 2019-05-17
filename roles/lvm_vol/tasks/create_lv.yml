@@ -1,0 +1,10 @@
+- name: Creating Logical Volume
+  lvol:
+    vg: "{{ vg_name }}"
+    lv: "{{ volname }}"
+    size: "{{ lv_size }}"
+    opts: "{{ lv_opts|default('') }}"
+    shrink: no
+  register: logical_volume
+
+- debug: var=logical_volume

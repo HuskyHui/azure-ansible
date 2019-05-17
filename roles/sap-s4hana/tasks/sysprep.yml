@@ -1,0 +1,31 @@
+- name: Add sapinst group
+  group: name=sapinst state=present
+
+- name: Add root to sapinst
+  user: name=root groups=sapinst
+
+- name: Install directory
+  file: 
+    path: "{{ install_log_path }}" 
+    state: directory
+    owner: root
+    group: sapinst
+    mode: 0777
+
+- name: Add hana host entry
+  lineinfile: 
+    dest: "/etc/hosts"
+    line: "{{ hdb_ip }} {{ hdb_hostname }}.{{ sys_fqdn }} {{ hdb_hostname }}"
+    regexp: "(^|\n){{ hdb_ip }} (.*)"
+  when: hdb_ip != "" 
+
+- name: Overriding default virtual ip
+  set_fact: 
+    virtual_ip: "{{ secondary_ip }}"
+  when: virtual_hostname != ansible_hostname and secondary_ip is defined
+
+- name: Add virtual host entry
+  lineinfile: 
+    dest: "/etc/hosts"
+    line: "{{ virtual_ip }} {{ virtual_hostname }}.{{ sys_fqdn }} {{ virtual_hostname }}"
+    regexp: "(^|\n){{ virtual_ip }} (.*)"

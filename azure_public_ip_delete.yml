@@ -1,0 +1,6 @@
+## --extra-vars="vm_name=test_vm"
+- hosts: localhost
+  vars:
+    public_ip_name: "{{ vm_name }}"
+  roles:
+    - { role: azure_public_ip, public_ip_action: "delete", delegate_facts: True }

@@ -1,0 +1,56 @@
+- name: get facts for network interface card
+  azure_rm_networkinterface_facts:
+    resource_group: "{{ rg }}"
+    name: "{{ network_interface_name }}"
+  register: nic_facts
+- debug:
+    var: nic_facts
+
+
+- name: get info
+  vars:
+    info_uri: "{{ nic_facts.ansible_facts.azure_networkinterfaces[0].properties.ipConfigurations[0].properties.subnet.id }}"
+    sg_uri: "{{ nic_facts.ansible_facts.azure_networkinterfaces[0].properties.networkSecurityGroup.id }}"
+  shell:
+    tmp=`echo {{ info_uri }} | awk -F '/' '{print $9}'` && echo $tmp
+  register: vn
+
+- name: get info
+  vars:
+    info_uri: "{{ nic_facts.ansible_facts.azure_networkinterfaces[0].properties.ipConfigurations[0].properties.subnet.id }}"
+  shell:
+    tmp=`echo {{ info_uri }}| awk -F '/' '{print $11}'` && echo $tmp
+  register: sb
+
+
+- name: get info
+  vars:
+    sg_uri: "{{ nic_facts.ansible_facts.azure_networkinterfaces[0].properties.networkSecurityGroup.id }}"
+  shell:
+    tmp=`echo {{ sg_uri }}|awk -F '/' '{print $9}'` && echo $tmp
+  register: sg
+
+- debug: var=sg.stdout_lines[0]
+- debug: var=vn
+- debug: var=sb
+
+- name: Create Virtual Network Interface Card
+  azure_rm_networkinterface:
+    resource_group: "{{ rg }}"
+    name: "{{ nic_facts.ansible_facts.azure_networkinterfaces[0].name }}"
+    virtual_network: "{{ vn.stdout_lines[0] }}"
+    subnet: "{{ sb.stdout_lines[0] }}"
+    security_group: "{{ sg.stdout_lines[0] }}"
+    ip_configurations:
+      - name: primary
+        primary: true
+        public_ip_address_name: "{{ vm_name }}"
+      - name: sec_private
+        primary: false
+
+  register: new_nic_facts
+- debug:
+    var: new_nic_facts
+- set_fact:
+    secondary_ip: "{{ new_nic_facts.state.ip_configurations[1].private_ip_address }}"
+  when: network_interface_action == "create_priv_ip"

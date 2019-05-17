@@ -1,0 +1,7 @@
+- hosts: poctest03
+  tasks:
+     - name: create folder
+       file:
+         path: /tmp/testtxh
+         state: directory
+         mode: 0777 

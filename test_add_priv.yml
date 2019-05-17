@@ -1,0 +1,7 @@
+- name: test1
+  hosts: localhost
+  vars:
+    network_interface_name: "{{ vm_name }}"
+  roles:
+    - { role: azure_network_interface, network_interface_action: "create_priv_ip", delegate_facts: True }
+   

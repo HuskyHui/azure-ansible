@@ -1,0 +1,6 @@
+- name: Create Source
+  file: path={{ source }}  state=directory mode=0755
+  register: source_ready
+
+- name: Mount to Destination
+  mount: opts=bind fstype=none state=mounted name={{ target }} src={{ source }}

@@ -1,0 +1,5 @@
+- fail: msg="Missing required parameter for lvm creation"
+  when: (disksize is not defined and cs_vol_device_id is not defined) or volname is not defined or mountpoint is not defined or fstype is not defined
+
+- block:
+    - include: tasks/fs_create.yml

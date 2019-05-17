@@ -1,0 +1,19 @@
+# Old Parameters
+- block:
+# zypper remove ulimit
+  - name: Remove ulimit from system
+    zypper: name=ulimit state=absent
+  - name: Disable transparent hugepages for running system
+    shell: 'echo "never" > /sys/kernel/mm/transparent_hugepage/enabled'
+  - name: Permanently disable transparent hugepages
+    lineinfile: "dest=/etc/init.d/boot.local line='transparent_hugepage=never'"
+  when: ansible_distribution == "SLES" and ansible_distribution_major_version == "11"
+
+#- block:
+#  - name: Activate uuid socket
+#    systemd:
+#      name: uuidd.socket
+#      state: started
+#      enabled: yes
+#  # to be continued
+#  when: ansible_distribution == "SLES" and ansible_distribution_major_version == "12"

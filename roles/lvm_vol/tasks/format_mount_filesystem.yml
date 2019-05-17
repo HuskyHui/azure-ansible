@@ -1,0 +1,34 @@
+- name: Check if Mountpoint already used
+  shell: mount | grep {{ mountpoint }} | tee
+  register: check_mountpoint
+
+- block:
+  - name: Refresh Facts
+    action: setup
+
+  - set_fact: mkfs_opts="-m0 -L {{ volname }}"
+    when: fstype|lower in ["ext2","ext3","ext4"]
+
+  - set_fact: mkfs_opts="-L {{ volname }}"
+    when: fstype|lower not in ["ext2","ext3","ext4"]
+
+  - block:
+    - name: Format Filesystem
+      filesystem: fstype="{{ fstype }}" dev="/dev/{{ vg_name }}/{{ volname }}" opts="{{ mkfs_opts }}"
+      register: fs_ready
+
+    - name: Creating Mountpoint
+      file: path="{{ mountpoint }}" state=directory mode=755
+      register: path_ready
+
+    - name: Refreshing kernel udev parameters
+      shell: "udevadm trigger --action=change"
+
+    - pause: prompt="Waiting for udev reload" seconds=5
+
+    - name: Mounting filesystem
+      mount: name="{{ mountpoint }}"  src="LABEL={{ volname }}" fstype="{{ fstype }}" opts="{{ mnt_opts }}" state=mounted
+      register: mounted
+      when: path_ready|success and fs_ready|success
+  when: check_mountpoint.stdout == ""
+

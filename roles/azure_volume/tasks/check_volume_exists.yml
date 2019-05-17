@@ -1,0 +1,14 @@
+- set_fact: volume_tag_exists=False
+
+- azure_rm_managed_disk_facts:
+    name: "{{ disk_name }}"
+    resource_group: "{{ rg }}"
+  register: az_volume_facts
+
+- set_fact: 
+    volume_tag_count: "{{ az_volume_facts.ansible_facts.azure_managed_disk | length }}"
+
+- set_fact: 
+    volume_tag_exists: True
+    volume_id: "{{ az_volume_facts.ansible_facts.azure_managed_disk[0].id }}"
+  when: volume_tag_count|int > 0

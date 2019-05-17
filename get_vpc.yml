@@ -1,0 +1,6 @@
+- hosts: localhost
+  tasks:
+  - name: Get facts for all virtual networks
+    azure_rm_networkinterface_facts:
+      resource_group: AnsiblePOC-Hosting-EUW-01-rg
+      
