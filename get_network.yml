@@ -6,5 +6,5 @@
   - name: Get facts by name
     azure_rm_networkinterface_facts:
       resource_group: "{{ rg }}"
-      name: testhdb01
+      name: tsthd0
     register: poctest03_nw 

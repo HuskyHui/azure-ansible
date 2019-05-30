@@ -67,11 +67,11 @@
     file: path="{{ install_data_path }}/SAPCAR" owner=root group=sapinst mode=0775
 
   - zypper:
-      name: p7zip
+      name: unrar
       state: present
 
   - name: extract export archives
-    shell: "cd {{ install_data_path }} && 7z x {{ item }}"
+    shell: "cd {{ install_data_path }} && unrar x -o+ {{ item }}"
     with_items:
       - "{{ s4hana_export_archive }}"
   

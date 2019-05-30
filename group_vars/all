@@ -11,13 +11,12 @@ sec_ng: Appserver-10.164.53.0_26-nsg
 storage_account: ansiblepoceuw
 playbook_dir: /etc/ansible
 ssh_key_path: "~/.ssh/ansible-keys/"
-vault_name: poc-ssh-keypair
+keys_vault: poc-ssh-keypair
 principal_name: 0ef4ce27-c793-466d-bf83-7807e7144062
 principal_password: e3ccc17f-bf3f-4252-84b1-8d42e6e39501
 principal_tenant: 1cf51555-fbcb-4b32-9e4f-4c1f7dd602f9
 default_user: geadmin
 default_password: Welcome123!@
-
 
 hana_size_map:
     'prod':

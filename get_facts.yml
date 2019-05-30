@@ -4,7 +4,7 @@
   - name: Get facts by name
     azure_rm_networkinterface_facts:
       resource_group: "{{ rg }}"
-      name: poctest02
+      name: tsthd0
     register: niec_facts
 
   - debug:

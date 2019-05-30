@@ -6,7 +6,7 @@
     key_name: "{{ vm_name }}"
     public_ip_name: "{{ vm_name }}"
     network_interface_name: "{{ vm_name }}"
-    ec2_service_offering: "{{ hana_size_map[system_usage][db_size_gb].instance_type }}"
+    azure_instance: "{{ hana_size_map[system_usage][db_size_gb].instance_type }}"
     hana_sap_size: "{{ hana_size_map[system_usage][db_size_gb].sap_size }}"
     install_size: 50
     hana_data_size: "{{ hana_size_map[system_usage][db_size_gb].data_size }}"

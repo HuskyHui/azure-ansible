@@ -8,6 +8,7 @@
  "hana_instance_num":"00", 
  "hana_passwd_all":"hd_pwd_1BOa", 
  "sys_hostname":"tsthd0",
+ "vm_name":"tsthd0",
  "sys_fqdn":"awt-sap.os.itelligence.de",
  "virtual_hostname":"tsthdv0",
  "os_root_passwd":"Initial12345"
