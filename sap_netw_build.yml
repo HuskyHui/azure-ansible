@@ -4,6 +4,7 @@
 - hosts: localhost
   vars:
     azure_profile: "test_hosts"
+    azure_instance: "Standard_E32_v3"
     hostgroup_name: "{{ azure_profile }}"
     key_name: "{{ vm_name }}"
     public_ip_name: "{{ vm_name }}"

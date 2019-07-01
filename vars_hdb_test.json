@@ -4,11 +4,11 @@
  "vpc_subnet_id":"subnet-6569960e", 
  "system_usage":"dev",
  "db_size_gb":"64", 
- "hana_sid":"AHD",
+ "hana_sid":"AHE",
  "hana_instance_num":"00", 
  "hana_passwd_all":"hd_pwd_1BOa", 
  "sys_hostname":"testhdb001",
  "sys_fqdn":"awt-sap.os.itelligence.de",
- "virtual_hostname":"tsthdv0",
+ "virtual_hostname":"tsthdv1",
  "os_root_passwd":"Initial12345"
 }

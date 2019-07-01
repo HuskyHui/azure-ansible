@@ -4,8 +4,8 @@
   command: az login --service-principal --username  {{ principal_name }} --password {{ principal_password }}  --tenant {{ principal_tenant }}
     
 - name: upload private key
-  command: az keyvault secret set --name {{ key_name }}-private --vault-name poc-ssh-keypair --file ~/.ssh/ansible-keys/{{ key_name }}
+  command: az keyvault secret set --name {{ key_name }}-private --vault-name {{ keys_vault }} --file ~/.ssh/ansible-keys/{{ key_name }}
 
 - name: upload public key
-  command: az keyvault secret set --name {{ key_name }}-public --vault-name poc-ssh-keypair --file ~/.ssh/ansible-keys/{{ key_name }}.pub
+  command: az keyvault secret set --name {{ key_name }}-public --vault-name {{ keys_vault }} --file ~/.ssh/ansible-keys/{{ key_name }}.pub
 
