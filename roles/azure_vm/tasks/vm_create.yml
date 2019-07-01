@@ -10,7 +10,7 @@
     #client_id: "{{ client_id }}"
     #secret: "{{ secret }}"
     #tenant: "{{ tenant }}"
-    managed_disk_type: Standard_LRS
+    managed_disk_type: "{{ disk_type }}"
     #storage_container_name: "{{ vm_name }}"
     #storage_blob_name: "{{ vm_name }}.vhd"
     ssh_public_keys:

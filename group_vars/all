@@ -1,5 +1,6 @@
 location: "westeurope"
 azure_instance: "Standard_E32_v3"
+disk_type: "Standard_LRS"
 subscription_id: dab95b88-dea7-448b-8ba5-99d4aa7b71b5
 client_id: d96d5b2d-a754-4c67-9e56-153d2904158d
 secret: EEbUiTdzBkzxV9uK2BYAZz5JNI73mg61X4xrCiNLyWM=
