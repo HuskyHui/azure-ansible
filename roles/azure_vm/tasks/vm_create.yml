@@ -4,11 +4,7 @@
     name: "{{ vm_name }}"
     vm_size: "{{ azure_instance }}"
     admin_username: "{{ default_user }}"
-<<<<<<< HEAD
-    admin_password: "{{ default_passwordd }}"
-=======
     admin_password: "{{ default_password }}"
->>>>>>> 335863fffbc020d53b0b6958997af09cfcafda38
     storage_account_name: "{{ storage_account }}"
     #subscription_id: "{{ subscription_id }}"
     #client_id: "{{ client_id }}"
